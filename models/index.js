@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
 });
 
 const kharchSchema = new mongoose.Schema({
-  uid: { type: String, required: true, unique: true },
+  uid: { type: String, required: true },
   kid: { type: String, required: true, unique: true },
   amount: { type: Number, required: true },
   date: { type: Date, required: true },
