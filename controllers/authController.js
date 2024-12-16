@@ -24,7 +24,7 @@ const signIn = async (req, res) => {
   if (!isMatch) {
     return res.status(400).json({ message: "Invalid credentials" });
   }
-  const token = jwt.sign({ email: email }, process.env.SECRET_KEY);
+  const token = jwt.sign({ id: user.uid }, process.env.SECRET_KEY);
   res.status(200).json({
     message: "Login successful",
     user: {

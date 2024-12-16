@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 const app = express();
 
@@ -15,7 +16,5 @@ mongoose
 app.use(cors());
 app.use(express.json());
 app.use("/auth", authRoutes);
-app.get("/user", authMiddleware, (req, res) => {
-  res.json({ message: "This is a protected route", user: req.user });
-});
+app.use("/user", authMiddleware, userRoutes);
 app.listen(process.env.PORT, () => {});
