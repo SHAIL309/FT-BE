@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const uuid = require("uuid");
 const jwt = require("jsonwebtoken");
-const { userSchema } = require("../models/user");
+const { userSchema } = require("../models/index");
 
 const User = mongoose.model("User", userSchema);
 

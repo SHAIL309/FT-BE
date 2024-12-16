@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const { userSchema } = require("../models/user");
+const { userSchema } = require("../models/index");
 const User = mongoose.model("User", userSchema);
 
 const getUser = async (req, res) => {

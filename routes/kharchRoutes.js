@@ -1,15 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { userSchema } = require("../models/index");
 const {
-  getUser,
-  deleteUser,
-  updateUser,
-} = require("../controllers/userController");
+  getAll,
+  getById,
+  add,
+  update,
+  remove,
+} = require("../controllers/kharchController");
 
-const User = mongoose.model("User", userSchema);
+const { userSchema } = require("../models");
 
 const route = express.Router();
+const User = mongoose.model("User", userSchema);
 
 route.param("id", async (req, res, next, id) => {
   if (!id) {
@@ -28,8 +30,10 @@ route.param("id", async (req, res, next, id) => {
   next();
 });
 
-route.get("/:id", getUser);
-route.put("/:id", updateUser);
-route.delete("/:id", deleteUser);
+route.get("/", getAll);
+route.get("/:kid", getById);
+route.post("/", add);
+route.put("/:kid", update);
+route.delete("/:kid", remove);
 
 module.exports = route;
