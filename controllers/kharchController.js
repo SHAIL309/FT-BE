@@ -51,7 +51,52 @@ const add = async (req, res) => {
   }
 };
 
-const update = () => {};
+const update = async (req, res) => {
+  const { amount, date, category, description } = req.body;
+  const { kid } = req.params;
+
+  const allowedFields = ["amount", "date", "category", "description"];
+  const invalidFields = Object.keys(req.body).filter(
+    (key) => !allowedFields.includes(key)
+  );
+
+  if (!!(invalidFields || []).length) {
+    return res.status(400).send({
+      message: "Attempt to update Invalid fields.",
+      invalidFields,
+    });
+  }
+
+  if (!amount && !date && !category && !description) {
+    res.status(400).send({ message: "Send appropriate data" });
+  }
+
+  const requestedKharch = await Kharcha.findOne({ kid });
+
+  if (requestedKharch["clear"]) {
+    return res.status(404).send({ message: "No entry for requested kharch" });
+  }
+
+  if (amount) {
+    requestedKharch["amount"] = amount;
+  }
+  if (date) {
+    requestedKharch["date"] = date;
+  }
+  if (category) {
+    requestedKharch["category"] = category;
+  }
+  if (description) {
+    requestedKharch["description"] = description;
+  }
+
+  try {
+    requestedKharch.save();
+    res.status(200).send({ message: "Kharch updated", requestedKharch });
+  } catch (err) {
+    return res.status(500).send({ message: "Error updating kharch" });
+  }
+};
 
 const remove = async (req, res) => {
   const { kid } = req.params;
@@ -62,7 +107,9 @@ const remove = async (req, res) => {
   if (!kharch) {
     return res.status(404).send({ message: "No entry for requested kharch" });
   }
+
   kharch["clear"] = true;
+
   try {
     kharch.save();
     res.status(200).send({ message: "Kharch cleared" });
