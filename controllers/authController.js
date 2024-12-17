@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const uuid = require("uuid");
 const jwt = require("jsonwebtoken");
-const { userSchema } = require("../models/user");
+const { userSchema } = require("../models/index");
 
 const User = mongoose.model("User", userSchema);
 
@@ -24,7 +24,7 @@ const signIn = async (req, res) => {
   if (!isMatch) {
     return res.status(400).json({ message: "Invalid credentials" });
   }
-  const token = jwt.sign({ email: email }, process.env.SECRET_KEY);
+  const token = jwt.sign({ id: user.uid }, process.env.SECRET_KEY);
   res.status(200).json({
     message: "Login successful",
     user: {
