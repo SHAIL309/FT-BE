@@ -2,9 +2,12 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const uuid = require("uuid");
 const jwt = require("jsonwebtoken");
-const { userSchema } = require("../models/index");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
+const { userSchema, tokenSchema } = require("../models/index");
 
 const User = mongoose.model("User", userSchema);
+const Token = mongoose.model("Token", tokenSchema);
 
 const signIn = async (req, res) => {
   const { email, password } = req.body;
@@ -67,7 +70,56 @@ const signUp = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user)
+      return res.status(400).send("user with given email doesn't exist");
+
+    let token = await Token.findOne({ userId: user.email });
+    if (!token) {
+      token = await new Token({
+        userId: user.email,
+        token: crypto.randomBytes(32).toString("hex"),
+      }).save();
+    }
+
+    const link = `${process.env.BASE_URL}/password-reset/${user.email}/${token.token}`;
+    await sendEmail(user.email, "Password reset", link);
+
+    res.send("password reset link sent to your email account");
+  } catch (error) {
+    res.send("An error occurred");
+    console.log(error);
+  }
+};
+const passwordReset = async (req, res) => {
+  const { email, token } = req.body;
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) return res.status(400).send("invalid link or expired");
+
+    const userToken = await Token.findOne({
+      userId: email,
+      token: token,
+    });
+    if (!userToken) return res.status(400).send("Invalid link or expired");
+
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    user.password = hashedPassword;
+    await user.save();
+    await userToken.deleteOne({ token: token });
+
+    res.send("password reset successfully.");
+  } catch (error) {
+    res.send("An error occurred");
+    console.log(error);
+  }
+};
+
 module.exports = {
   signUp,
   signIn,
+  forgotPassword,
+  passwordReset,
 };
