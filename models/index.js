@@ -18,7 +18,25 @@ const kharchSchema = new mongoose.Schema({
   clear: { type: Boolean, required: true, default: false },
 });
 
+const tokenSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+    ref: "user",
+  },
+  token: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    expires: 3600,
+  },
+});
+
 module.exports = {
   userSchema,
   kharchSchema,
+  tokenSchema,
 };

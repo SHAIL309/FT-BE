@@ -5,7 +5,11 @@ const User = mongoose.model("User", userSchema);
 
 const getUser = async (req, res) => {
   const user = await User.findOne({ uid: req.params.id });
-  return res.send({ user });
+  return res.send({
+    full_name: user.full_name,
+    email: user.email,
+    id: user.uid,
+  });
 };
 
 const updateUser = async (req, res) => {
